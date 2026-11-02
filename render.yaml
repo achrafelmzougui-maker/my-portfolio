@@ -1,0 +1,16 @@
+# Render Blueprint for TrafficFlow AI: synthetic demo only.
+# Deploying this blueprint may require a Render account and incur charges
+# depending on the selected plan. Review settings before confirming.
+services:
+  - type: web
+    name: trafficflow-ai-demo
+    runtime: python
+    rootDir: trafficflow-ai
+    buildCommand: pip install -r backend/requirements.txt && python ml/generate_demo_data.py --days 30 && python ml/train.py --data ml/demo_synthetic.csv --synthetic
+    startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: CORS_ORIGINS
+        value: https://achrafelmzougui-maker.github.io
