@@ -40,3 +40,10 @@ Consultez [PROJECT_CATALOG.md](PROJECT_CATALOG.md) pour les projets, les technol
 - [Catalogue et statut des sources](PROJECT_CATALOG.md)
 
 **Transparence :** plusieurs projets historiques (LV Manager, stock VB.NET, e-commerce PHP, bibliothèque PDF, site de location) sont documentés dans le catalogue, mais leurs sources originales ne sont pas disponibles ici. Les reconstructions ne sont pas présentées comme des copies de ces projets.
+
+## Validation continue
+
+[![TrafficFlow Python tests](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/trafficflow-python-tests.yml/badge.svg)](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/trafficflow-python-tests.yml)
+[![Academic demo checks](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/academic-demos.yml/badge.svg)](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/academic-demos.yml)
+
+Les workflows GitHub Actions vérifient le pipeline Python de TrafficFlow (données **synthétiques**, API et tests) et les nouvelles démos Python/Prolog. Les badges affichent le statut GitHub actuel; ils ne prouvent pas une validation sur données réelles, ni un déploiement du backend.
