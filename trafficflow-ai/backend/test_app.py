@@ -58,3 +58,31 @@ def test_model_info_without_model_is_explicit():
         assert info["live_traffic"] is False
     finally:
         service.model, service.model_metadata = previous_model, previous_metadata
+
+def test_nonfinite_model_prediction_returns_503():
+    class BrokenModel:
+        def predict(self, features):
+            return [float("nan")]
+    previous = service.model
+    try:
+        service.model = BrokenModel()
+        response = client.post("/predict", json={
+            "zone": "Centre-ville", "hour": 8, "day_of_week": 0
+        })
+        assert response.status_code == 503
+        assert "invalid prediction" in response.json()["detail"]
+    finally:
+        service.model = previous
+
+
+def test_model_reload_resets_stale_state(monkeypatch, tmp_path):
+    previous_model, previous_metadata = service.model, service.model_metadata
+    try:
+        monkeypatch.setattr(service, "MODEL_PATH", tmp_path / "missing.joblib")
+        service.model = object()
+        service.model_metadata = {"dataset_type": "synthetic_demo"}
+        service.load_model()
+        assert service.model is None
+        assert service.model_metadata is None
+    finally:
+        service.model, service.model_metadata = previous_model, previous_metadata
