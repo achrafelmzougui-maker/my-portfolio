@@ -49,3 +49,7 @@ Consultez [PROJECT_CATALOG.md](PROJECT_CATALOG.md) pour les projets, les technol
 [![Academic demo checks](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/academic-demos.yml/badge.svg)](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/academic-demos.yml)
 
 Les workflows GitHub Actions vérifient le pipeline Python de TrafficFlow (données **synthétiques**, API et tests) et les nouvelles démos Python/Prolog. Les badges affichent le statut GitHub actuel; ils ne prouvent pas une validation sur données réelles, ni un déploiement du backend.
+
+## Guide de vérification pour les recruteurs
+
+[Consulter le guide de reproductibilité et les preuves disponibles](docs/REPRODUCIBILITY.md) — liens vers les démos, commandes de tests, limites et feuille de route PFE.
