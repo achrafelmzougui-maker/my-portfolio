@@ -6,6 +6,7 @@ on:
       - 'trafficflow-ai/ml/**'
       - 'trafficflow-ai/test_integration.py'
       - '.github/workflows/trafficflow-python-tests.yml'
+      - 'render.yaml'
   pull_request:
     paths:
       - 'trafficflow-ai/backend/**'
@@ -32,3 +33,34 @@ jobs:
       - name: Run end-to-end synthetic integration test
         working-directory: trafficflow-ai
         run: python -m pytest -q test_integration.py
+      - name: Build synthetic demo like Render
+        working-directory: trafficflow-ai
+        run: |
+          python ml/generate_demo_data.py --days 7
+          python ml/train.py --data ml/demo_synthetic.csv --synthetic
+      - name: Verify deployable API endpoints
+        working-directory: trafficflow-ai
+        run: |
+          python - <<'PY'
+          import json
+          from fastapi.testclient import TestClient
+          from backend.app import app
+          with TestClient(app) as client:
+              health = client.get("/health")
+              assert health.status_code == 200, health.text
+              assert health.json()["model_loaded"] is True
+              ready = client.get("/ready")
+              assert ready.status_code == 200, ready.text
+              info = client.get("/model-info")
+              assert info.status_code == 200, info.text
+              assert info.json()["dataset_type"] == "synthetic_demo"
+              assert info.json()["dataset_verified"] is False
+              assert info.json()["feature_timezone"] == "Africa/Casablanca"
+              prediction = client.post("/predict", json={"zone":"Centre-ville","hour":8,"day_of_week":0})
+              assert prediction.status_code == 200, prediction.text
+              result = prediction.json()
+              assert result["synthetic_training_data"] is True
+              assert result["live_traffic"] is False
+              assert 0 <= result["congestion_index"] <= 100
+              print(json.dumps({"health":health.json(),"model":info.json(),"prediction":result},ensure_ascii=False))
+          PY
