@@ -57,3 +57,7 @@ Les workflows GitHub Actions vérifient le pipeline Python de TrafficFlow (donn�
 ## Architectures techniques
 
 [Diagrammes Mermaid des prototypes](docs/ARCHITECTURES.md) — TrafficFlow AI, Smart Attendance, Rasa, Football Value et Prolog Checkers, avec limites de chaque démonstration.
+
+## Catalogue web des 12 projets
+
+[Ouvrir le catalogue interactif](https://achrafelmzougui-maker.github.io/my-portfolio/projects/) — démos, code source et documentation classés par statut.
