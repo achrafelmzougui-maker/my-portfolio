@@ -1,5 +1,5 @@
 // Offline shell for the synthetic web demo only. API responses are never cached.
-const CACHE_NAME = 'trafficflow-kenitra-v1';
+const CACHE_NAME = 'trafficflow-kenitra-v2';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
