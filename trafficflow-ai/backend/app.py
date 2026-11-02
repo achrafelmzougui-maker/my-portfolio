@@ -1,6 +1,7 @@
 """TrafficFlow AI API. Requires an explicitly trained and saved model."""
 import os
 import json
+import math
 from pathlib import Path
 from typing import Literal
 import joblib
@@ -12,7 +13,7 @@ from pydantic import BaseModel, Field
 ROOT = Path(__file__).resolve().parents[1]
 MODEL_PATH = ROOT / "ml" / "traffic_model.joblib"
 ZONES = ("Centre-ville", "Maâmora", "Bir Rami", "Mimosas")
-app = FastAPI(title="TrafficFlow AI", version="1.1.0",
+app = FastAPI(title="TrafficFlow AI", version="1.5.0",
               description="Experimental traffic-congestion prediction API. No live traffic data.")
 # Set CORS_ORIGINS to an explicit comma-separated allowlist of trusted web origins.
 # Example: https://achrafelmzougui-maker.github.io
@@ -25,6 +26,8 @@ model_metadata = None
 @app.on_event("startup")
 def load_model():
     global model, model_metadata
+    model = None
+    model_metadata = None
     if MODEL_PATH.exists():
         model = joblib.load(MODEL_PATH)
         metadata_path = MODEL_PATH.with_suffix(".metadata.json")
@@ -78,6 +81,8 @@ def predict(request: PredictionRequest):
                             detail="No trained model installed. Train on an authorized dataset first.")
     features = pd.DataFrame([request.model_dump()])
     value = float(model.predict(features)[0])
+    if not math.isfinite(value):
+        raise HTTPException(status_code=503, detail="Model returned an invalid prediction")
     score = round(max(0.0, min(100.0, value)), 1)
     dataset_type = model_metadata.get("dataset_type", "unknown") if model_metadata else "unknown"
     synthetic = dataset_type == "synthetic_demo"
