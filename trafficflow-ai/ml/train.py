@@ -31,8 +31,9 @@ def train(input_path: Path, output_path: Path, synthetic: bool = False):
     data = data.sort_values("timestamp").reset_index(drop=True)
     if len(data) < 50:
         raise ValueError("At least 50 observations required for this baseline.")
-    data["hour"] = data["timestamp"].dt.hour
-    data["day_of_week"] = data["timestamp"].dt.dayofweek
+    local = data["timestamp"].dt.tz_convert("Africa/Casablanca")
+    data["hour"] = local.dt.hour
+    data["day_of_week"] = local.dt.dayofweek
     # Keep simultaneous observations together to prevent temporal leakage.
     unique_times = data["timestamp"].drop_duplicates().sort_values().reset_index(drop=True)
     if len(unique_times) < 10:
@@ -58,6 +59,7 @@ def train(input_path: Path, output_path: Path, synthetic: bool = False):
         "synthetic": synthetic,
         "rows": len(data), "train_rows": len(train_df), "test_rows": len(test_df),
         "split": "chronological_unique_timestamp_80_20",
+        "feature_timezone": "Africa/Casablanca",
         "test_start_utc": str(test_df["timestamp"].min()),
         "mae": round(float(mean_absolute_error(test_df["congestion_index"], predicted)), 4),
         "rmse": round(float(mean_squared_error(test_df["congestion_index"], predicted) ** .5), 4),
