@@ -1,0 +1,20 @@
+{
+  "id": "/my-portfolio/trafficflow-ai/",
+  "name": "TrafficFlow AI — Kénitra",
+  "short_name": "TrafficFlow",
+  "description": "Simulation académique de congestion routière à Kénitra. Données fictives, pas de trafic en direct.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#071320",
+  "theme_color": "#071320",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
