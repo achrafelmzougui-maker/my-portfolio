@@ -4,6 +4,8 @@ on:
     paths:
       - 'trafficflow-ai/backend/**'
       - 'trafficflow-ai/ml/**'
+      - 'trafficflow-ai/test_integration.py'
+      - 'trafficflow-ai/test_integration.py'
       - '.github/workflows/trafficflow-python-tests.yml'
   pull_request:
     paths:
@@ -27,3 +29,6 @@ jobs:
       - name: Run ML validation tests
         working-directory: trafficflow-ai/ml
         run: python -m pytest -q test_train.py test_generate_demo_data.py
+      - name: Run end-to-end synthetic integration test
+        working-directory: trafficflow-ai
+        run: python -m pytest -q test_integration.py
