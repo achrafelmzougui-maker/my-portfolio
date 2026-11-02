@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "TrafficFlow AI",
+    "slug": "trafficflow-ai",
+    "scheme": "trafficflow",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.achrafelmzougui.trafficflowai"
+    },
+    "android": {
+      "package": "com.achrafelmzougui.trafficflowai"
+    },
+    "extra": {
+      "apiBaseUrl": ""
+    }
+  }
+}
