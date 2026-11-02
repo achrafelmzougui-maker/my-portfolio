@@ -1,5 +1,6 @@
 """TrafficFlow AI API. Requires an explicitly trained and saved model."""
 import os
+import json
 from pathlib import Path
 from typing import Literal
 import joblib
@@ -19,12 +20,16 @@ origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",")
 if origins:
     app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
 model = None
+model_metadata = None
 
 @app.on_event("startup")
 def load_model():
-    global model
+    global model, model_metadata
     if MODEL_PATH.exists():
         model = joblib.load(MODEL_PATH)
+        metadata_path = MODEL_PATH.with_suffix(".metadata.json")
+        if metadata_path.exists():
+            model_metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
 
 class PredictionRequest(BaseModel):
     zone: Literal["Centre-ville", "Maâmora", "Bir Rami", "Mimosas"]
@@ -34,7 +39,8 @@ class PredictionRequest(BaseModel):
 @app.get("/health")
 def health():
     return {"status": "ok", "model_loaded": model is not None,
-            "live_traffic": False, "city": "Kénitra"}
+            "live_traffic": False, "city": "Kénitra",
+            "dataset_type": model_metadata.get("dataset_type", "unknown") if model_metadata else "unknown"}
 
 @app.post("/predict")
 def predict(request: PredictionRequest):
@@ -44,8 +50,12 @@ def predict(request: PredictionRequest):
     features = pd.DataFrame([request.model_dump()])
     value = float(model.predict(features)[0])
     score = round(max(0.0, min(100.0, value)), 1)
+    synthetic = model_metadata is None or model_metadata.get("synthetic") is not False
     return {"city": "Kénitra", "zone": request.zone, "hour": request.hour,
             "day_of_week": request.day_of_week, "congestion_index": score,
             "level": "high" if score >= 68 else "medium" if score >= 40 else "low",
             "source": "trained_model", "live_traffic": False,
-            "warning": "Experimental estimate; not suitable for navigation decisions."}
+            "synthetic_training_data": synthetic,
+            "dataset_type": model_metadata.get("dataset_type", "unknown") if model_metadata else "unknown",
+            "warning": ("Trained on synthetic or unverified data. Not a real-world traffic prediction."
+                        if synthetic else "Experimental estimate; not suitable for navigation decisions.")}
