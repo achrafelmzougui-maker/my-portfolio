@@ -37,7 +37,7 @@ To verify that the training pipeline and API can work together before obtaining 
 # From trafficflow-ai/
 python -m pip install -r backend/requirements.txt
 python ml/generate_demo_data.py --days 90
-python ml/train.py --data ml/demo_synthetic.csv
+python ml/train.py --data ml/demo_synthetic.csv --synthetic
 python -m uvicorn backend.app:app --reload
 ```
 
@@ -48,3 +48,5 @@ Then visit `http://127.0.0.1:8000/docs` and submit:
 ```
 
 **Critical:** the generator uses a predefined mathematical pattern and random noise. Any ML metrics computed on this data only measure how well a model learns that *artificial* pattern. They do **not** measure Kénitra traffic forecasting quality. The generated CSV and trained model are local-only and ignored by Git. The browser-based GitHub Pages client needs a separately deployed HTTPS API and allowed CORS origin; it cannot reach your local localhost API from another device.
+
+Training writes a sibling `traffic_model.metadata.json` with the evaluation metrics and an explicit synthetic flag. Treat this metadata as a self-declaration, not independent evidence of dataset provenance.
