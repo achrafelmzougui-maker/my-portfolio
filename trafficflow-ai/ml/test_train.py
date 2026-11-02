@@ -27,3 +27,11 @@ def test_reject_small_dataset():
                       "zone": ["Centre-ville"], "congestion_index": [42]}).to_csv(csv_path, index=False)
         with pytest.raises(ValueError, match="At least 50"):
             train(csv_path, Path(directory) / "model.joblib")
+
+def test_timezone_metadata(tmp_path):
+    from generate_demo_data import generate
+    csv_file = tmp_path / 'demo.csv'
+    model_file = tmp_path / 'model.joblib'
+    generate(csv_file, days=4)
+    metrics = train(csv_file, model_file, synthetic=True)
+    assert metrics['feature_timezone'] == 'Africa/Casablanca'
