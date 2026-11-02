@@ -1,0 +1,27 @@
+name: TrafficFlow Python checks
+on:
+  push:
+    paths:
+      - 'trafficflow-ai/backend/**'
+      - 'trafficflow-ai/ml/**'
+      - 'trafficflow-ai/.github/workflows/**'
+  pull_request:
+    paths:
+      - 'trafficflow-ai/backend/**'
+      - 'trafficflow-ai/ml/**'
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r trafficflow-ai/backend/requirements.txt pytest httpx
+      - name: Run tests
+        run: |
+          cd trafficflow-ai/backend && python -m pytest -q test_app.py
+          cd ../ml && python -m pytest -q test_train.py
