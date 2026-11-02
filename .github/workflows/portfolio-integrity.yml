@@ -1,0 +1,29 @@
+name: Portfolio integrity
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'trafficflow-ai/**'
+      - 'smart-attendance/**'
+      - 'arabic-learning-game/**'
+      - 'nfc-digital-card/**'
+      - 'tests/**'
+      - '.github/workflows/portfolio-integrity.yml'
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'trafficflow-ai/**'
+      - 'smart-attendance/**'
+      - 'arabic-learning-game/**'
+      - 'nfc-digital-card/**'
+      - 'tests/**'
+jobs:
+  links-and-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate static pages, relative links and language controls
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
