@@ -22,6 +22,7 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [mode, setMode] = useState('simulation');
+  const [provenance, setProvenance] = useState('synthetic');
   async function predict() {
     const parsedHour = Number(hour);
     if (!/^\d{1,2}$/.test(hour) || parsedHour < 0 || parsedHour > 23) {
@@ -34,6 +35,7 @@ export default function App() {
       if (!API_URL) {
         setResult(simulate(parsedHour, zone, weekend));
         setMode('simulation');
+        setProvenance('synthetic');
       } else {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 8000);
@@ -49,6 +51,7 @@ export default function App() {
           if (typeof data.congestion_index !== 'number') throw new Error('Réponse API invalide.');
           setResult(data.congestion_index);
           setMode('api');
+          setProvenance(data.synthetic_training_data === true ? 'synthetic' : data.dataset_verified === true ? 'verified' : 'unverified');
         } finally {
           clearTimeout(timeout);
         }
@@ -71,7 +74,7 @@ export default function App() {
       <TouchableOpacity accessibilityRole="button" onPress={predict} disabled={loading} style={styles.button}>{loading?<ActivityIndicator color={COLORS.bg}/>:<Text style={styles.buttonText}>Simuler la congestion →</Text>}</TouchableOpacity>
       {!!error && <Text accessibilityRole="alert" style={styles.error}>{error}</Text>}
     </View>
-    {result !== null && <View style={styles.result}><Text style={styles.eyebrow}>{mode==='simulation'?'SCÉNARIO SYNTHÉTIQUE':'RÉSULTAT MODÈLE EXPÉRIMENTAL'}</Text><Text style={styles.score}>{Math.round(result)}<Text style={styles.outOf}> / 100</Text></Text><Text style={styles.level}>{getLevel(result)}</Text><Text style={styles.description}>Zone : {zone} · {hour.padStart(2,'0')}:00</Text></View>}
+    {result !== null && <View style={styles.result}><Text style={styles.eyebrow}>{mode==='simulation'?'SCÉNARIO SYNTHÉTIQUE':provenance==='synthetic'?'MODÈLE · DONNÉES SYNTHÉTIQUES':provenance==='unverified'?'MODÈLE · SOURCE NON VÉRIFIÉE':'MODÈLE EXPÉRIMENTAL · DONNÉES DOCUMENTÉES'}</Text><Text style={styles.score}>{Math.round(result)}<Text style={styles.outOf}> / 100</Text></Text><Text style={styles.level}>{getLevel(result)}</Text><Text style={styles.description}>Zone : {zone} · {hour.padStart(2,'0')}:00</Text><Text style={styles.description}>{provenance==='synthetic'?'Résultat artificiel, pas une prévision réelle.':provenance==='unverified'?'Source non vérifiée : résultat non validé.':'Estimation expérimentale, non adaptée à la navigation.'}</Text></View>}
     <View style={styles.note}><Text style={styles.noteTitle}>TRANSPARENCE DES DONNÉES</Text><Text style={styles.description}>Mode actuel : {API_URL?'API expérimentale':'simulation locale'}. Sans données de trafic réelles ni modèle entraîné, les chiffres sont purement illustratifs. Ne pas utiliser pour des décisions de navigation.</Text></View>
     <Text style={styles.footer}>TrafficFlow AI · Projet académique · Android / iOS</Text>
   </ScrollView></SafeAreaView>;
