@@ -43,6 +43,8 @@ Consultez [PROJECT_CATALOG.md](PROJECT_CATALOG.md) pour les projets, les technol
 
 ## Validation continue
 
+[![Portfolio integrity](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/portfolio-integrity.yml/badge.svg)](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/portfolio-integrity.yml)
+
 [![TrafficFlow Python tests](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/trafficflow-python-tests.yml/badge.svg)](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/trafficflow-python-tests.yml)
 [![Academic demo checks](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/academic-demos.yml/badge.svg)](https://github.com/achrafelmzougui-maker/my-portfolio/actions/workflows/academic-demos.yml)
 
