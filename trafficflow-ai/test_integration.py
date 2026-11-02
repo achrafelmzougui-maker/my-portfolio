@@ -37,6 +37,14 @@ def test_synthetic_training_to_api(tmp_path: Path):
         api.model = joblib.load(model_file)
         api.model_metadata = metrics
         client = TestClient(api.app)
+        ready = client.get("/ready")
+        assert ready.status_code == 200
+        assert ready.json()["ready"] is True
+        info = client.get("/model-info")
+        assert info.status_code == 200
+        assert info.json()["dataset_type"] == "synthetic_demo"
+        assert info.json()["dataset_verified"] is False
+        assert info.json()["feature_timezone"] == "Africa/Casablanca"
         health = client.get("/health")
         assert health.status_code == 200
         assert health.json()["model_loaded"] is True
