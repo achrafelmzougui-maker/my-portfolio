@@ -26,4 +26,4 @@ jobs:
         run: python -m pytest -q test_app.py
       - name: Run ML validation tests
         working-directory: trafficflow-ai/ml
-        run: python -m pytest -q test_train.py
+        run: python -m pytest -q test_train.py test_generate_demo_data.py
