@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 ROOT = Path(__file__).resolve().parents[1]
 MODEL_PATH = ROOT / "ml" / "traffic_model.joblib"
 ZONES = ("Centre-ville", "Maâmora", "Bir Rami", "Mimosas")
-app = FastAPI(title="TrafficFlow AI", version="0.9.0",
+app = FastAPI(title="TrafficFlow AI", version="1.1.0",
               description="Experimental traffic-congestion prediction API. No live traffic data.")
 # Set CORS_ORIGINS to an explicit comma-separated allowlist of trusted web origins.
 # Example: https://achrafelmzougui-maker.github.io
@@ -41,6 +41,35 @@ def health():
     return {"status": "ok", "model_loaded": model is not None,
             "live_traffic": False, "city": "Kénitra",
             "dataset_type": model_metadata.get("dataset_type", "unknown") if model_metadata else "unknown"}
+
+@app.get("/ready")
+def ready():
+    """Deployment readiness: returns 503 until a trained model is loaded."""
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+    return {"ready": True, "live_traffic": False}
+
+
+@app.get("/model-info")
+def model_info():
+    """Non-sensitive model provenance; no training rows or filesystem paths."""
+    info = model_metadata or {}
+    dataset_type = info.get("dataset_type", "unknown")
+    return {
+        "model_loaded": model is not None,
+        "city": "Kénitra",
+        "live_traffic": False,
+        "dataset_type": dataset_type,
+        "dataset_verified": dataset_type == "verified_observations" and info.get("verified") is True,
+        "synthetic_training_data": dataset_type == "synthetic_demo",
+        "feature_timezone": info.get("feature_timezone", "unknown"),
+        "validation_split": info.get("split"),
+        "mae": info.get("mae"),
+        "rmse": info.get("rmse"),
+        "baseline_mae": info.get("baseline_mae"),
+        "notice": "Metadata is self-declared, not independent proof of dataset authenticity.",
+    }
+
 
 @app.post("/predict")
 def predict(request: PredictionRequest):
