@@ -53,3 +53,7 @@ Les workflows GitHub Actions vérifient le pipeline Python de TrafficFlow (donn�
 ## Guide de vérification pour les recruteurs
 
 [Consulter le guide de reproductibilité et les preuves disponibles](docs/REPRODUCIBILITY.md) — liens vers les démos, commandes de tests, limites et feuille de route PFE.
+
+## Architectures techniques
+
+[Diagrammes Mermaid des prototypes](docs/ARCHITECTURES.md) — TrafficFlow AI, Smart Attendance, Rasa, Football Value et Prolog Checkers, avec limites de chaque démonstration.
