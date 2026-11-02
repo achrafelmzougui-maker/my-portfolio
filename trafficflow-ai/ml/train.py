@@ -33,8 +33,15 @@ def train(input_path: Path, output_path: Path):
         raise ValueError("At least 50 observations required for this baseline.")
     data["hour"] = data["timestamp"].dt.hour
     data["day_of_week"] = data["timestamp"].dt.dayofweek
-    cut = int(len(data) * .8)
-    train_df, test_df = data.iloc[:cut], data.iloc[cut:]
+    # Keep simultaneous observations together to prevent temporal leakage.
+    unique_times = data["timestamp"].drop_duplicates().sort_values().reset_index(drop=True)
+    if len(unique_times) < 10:
+        raise ValueError("At least 10 distinct timestamps required for temporal evaluation.")
+    split_time = unique_times.iloc[int(len(unique_times) * .8)]
+    train_df = data[data["timestamp"] < split_time]
+    test_df = data[data["timestamp"] >= split_time]
+    if train_df.empty or test_df.empty:
+        raise ValueError("Temporal split produced an empty partition.")
     xcols = ["zone", "hour", "day_of_week"]
     pipeline = Pipeline([
         ("features", ColumnTransformer([
@@ -49,7 +56,8 @@ def train(input_path: Path, output_path: Path):
     metrics = {
         "dataset_type": "user_supplied_verify_provenance",
         "rows": len(data), "train_rows": len(train_df), "test_rows": len(test_df),
-        "split": "chronological_80_20",
+        "split": "chronological_unique_timestamp_80_20",
+        "test_start_utc": str(test_df["timestamp"].min()),
         "mae": round(float(mean_absolute_error(test_df["congestion_index"], predicted)), 4),
         "rmse": round(float(mean_squared_error(test_df["congestion_index"], predicted) ** .5), 4),
         "baseline_mae": round(float(mean_absolute_error(
