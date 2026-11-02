@@ -5,12 +5,12 @@ on:
       - 'trafficflow-ai/backend/**'
       - 'trafficflow-ai/ml/**'
       - 'trafficflow-ai/test_integration.py'
-      - 'trafficflow-ai/test_integration.py'
       - '.github/workflows/trafficflow-python-tests.yml'
   pull_request:
     paths:
       - 'trafficflow-ai/backend/**'
       - 'trafficflow-ai/ml/**'
+      - 'trafficflow-ai/test_integration.py'
 jobs:
   tests:
     runs-on: ubuntu-latest
