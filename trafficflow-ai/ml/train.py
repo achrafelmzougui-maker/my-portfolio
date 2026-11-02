@@ -17,7 +17,7 @@ from sklearn.preprocessing import OneHotEncoder
 HERE = Path(__file__).resolve().parent
 ZONES = {"Centre-ville", "Maâmora", "Bir Rami", "Mimosas"}
 
-def train(input_path: Path, output_path: Path):
+def train(input_path: Path, output_path: Path, synthetic: bool = False):
     data = pd.read_csv(input_path)
     required = {"timestamp", "zone", "congestion_index"}
     if not required.issubset(data.columns):
@@ -54,7 +54,8 @@ def train(input_path: Path, output_path: Path):
     pipeline.fit(train_df[xcols], train_df["congestion_index"])
     predicted = pipeline.predict(test_df[xcols])
     metrics = {
-        "dataset_type": "user_supplied_verify_provenance",
+        "dataset_type": "synthetic_demo" if synthetic else "user_supplied_unverified",
+        "synthetic": synthetic,
         "rows": len(data), "train_rows": len(train_df), "test_rows": len(test_df),
         "split": "chronological_unique_timestamp_80_20",
         "test_start_utc": str(test_df["timestamp"].min()),
@@ -67,6 +68,8 @@ def train(input_path: Path, output_path: Path):
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(pipeline, output_path)
+    # Store provenance alongside the model. This is metadata, not proof of source authenticity.
+    output_path.with_suffix('.metadata.json').write_text(json.dumps(metrics, indent=2), encoding='utf-8')
     print(json.dumps(metrics, indent=2))
     return metrics
 
@@ -74,5 +77,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=HERE / "traffic_model.joblib")
+    parser.add_argument("--synthetic", action="store_true", help="Mark generated demonstration data as synthetic")
     args = parser.parse_args()
-    train(args.data, args.output)
+    train(args.data, args.output, synthetic=args.synthetic)
