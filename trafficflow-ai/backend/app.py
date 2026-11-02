@@ -1,10 +1,11 @@
 """TrafficFlow AI API. Requires an explicitly trained and saved model."""
-from datetime import datetime
+import os
 from pathlib import Path
 from typing import Literal
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,6 +13,11 @@ MODEL_PATH = ROOT / "ml" / "traffic_model.joblib"
 ZONES = ("Centre-ville", "Maâmora", "Bir Rami", "Mimosas")
 app = FastAPI(title="TrafficFlow AI", version="0.2.0",
               description="Experimental traffic-congestion prediction API. No live traffic data.")
+# Set CORS_ORIGINS to an explicit comma-separated allowlist of trusted web origins.
+# Example: https://achrafelmzougui-maker.github.io
+origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin.strip()]
+if origins:
+    app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
 model = None
 
 @app.on_event("startup")
