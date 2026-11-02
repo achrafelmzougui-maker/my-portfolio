@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 ROOT = Path(__file__).resolve().parents[1]
 MODEL_PATH = ROOT / "ml" / "traffic_model.joblib"
 ZONES = ("Centre-ville", "Maâmora", "Bir Rami", "Mimosas")
-app = FastAPI(title="TrafficFlow AI", version="0.2.0",
+app = FastAPI(title="TrafficFlow AI", version="0.9.0",
               description="Experimental traffic-congestion prediction API. No live traffic data.")
 # Set CORS_ORIGINS to an explicit comma-separated allowlist of trusted web origins.
 # Example: https://achrafelmzougui-maker.github.io
@@ -50,12 +50,16 @@ def predict(request: PredictionRequest):
     features = pd.DataFrame([request.model_dump()])
     value = float(model.predict(features)[0])
     score = round(max(0.0, min(100.0, value)), 1)
-    synthetic = model_metadata is None or model_metadata.get("synthetic") is not False
+    dataset_type = model_metadata.get("dataset_type", "unknown") if model_metadata else "unknown"
+    synthetic = dataset_type == "synthetic_demo"
+    verified = dataset_type == "verified_observations" and model_metadata.get("verified") is True if model_metadata else False
     return {"city": "Kénitra", "zone": request.zone, "hour": request.hour,
             "day_of_week": request.day_of_week, "congestion_index": score,
             "level": "high" if score >= 68 else "medium" if score >= 40 else "low",
             "source": "trained_model", "live_traffic": False,
             "synthetic_training_data": synthetic,
-            "dataset_type": model_metadata.get("dataset_type", "unknown") if model_metadata else "unknown",
-            "warning": ("Trained on synthetic or unverified data. Not a real-world traffic prediction."
-                        if synthetic else "Experimental estimate; not suitable for navigation decisions.")}
+            "dataset_verified": verified,
+            "dataset_type": dataset_type,
+            "warning": ("Synthetic training data; NOT a real-world traffic prediction." if synthetic
+                        else "Dataset provenance unverified; NOT a validated traffic prediction." if not verified
+                        else "Experimental estimate based on documented data; not for navigation decisions.")}
