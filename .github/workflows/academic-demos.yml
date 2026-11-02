@@ -1,0 +1,29 @@
+name: Academic demo checks
+on:
+  push:
+    paths:
+      - 'football-value-predictor/**'
+      - 'prolog-checkers/**'
+      - '.github/workflows/academic-demos.yml'
+  pull_request:
+    paths:
+      - 'football-value-predictor/**'
+      - 'prolog-checkers/**'
+jobs:
+  demo-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test fictional football value demo
+        run: |
+          python football-value-predictor/predict.py --test
+          python football-value-predictor/predict.py --age 23 --goals 12 --assists 7 --minutes 2200
+      - name: Install SWI-Prolog
+        run: sudo apt-get update && sudo apt-get install -y swi-prolog-nox
+      - name: Test reconstructed Prolog rules
+        run: |
+          swipl -q -s prolog-checkers/checkers.pl -g run_tests -t halt
+          swipl -q -s prolog-checkers/checkers.pl -g run_demo -t halt
