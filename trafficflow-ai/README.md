@@ -11,6 +11,8 @@ The published website remains a **responsive, client-side traffic scenario simul
 - `ml/train.py` — scikit-learn baseline, input validation, chronological train/test split, MAE/RMSE and median baseline.
 - `backend/app.py` — FastAPI health and prediction endpoints; returns HTTP 503 if no trained model is installed rather than inventing results.
 - `backend/requirements.txt` — Python dependencies.
+- `mobile/App.js` — React Native / Expo Android and iOS prototype, with clearly labeled simulation mode and optional API integration.
+- `mobile/package.json` and `mobile/app.json` — Expo configuration and dependencies.
 - `.gitignore` — excludes local data, models and secrets.
 
 ## Run locally
@@ -22,9 +24,9 @@ See [ML instructions](ml/README.md) and [API instructions](backend/README.md). N
 1. Source and document a real Kénitra traffic dataset (license, time period, road coverage, collection method).
 2. Train and evaluate with held-out future observations and meaningful baselines.
 3. Deploy the FastAPI service securely and connect the web interface to the API.
-4. Create React Native / Expo Android and iOS apps that share the API.
+4. Run and validate the React Native / Expo Android and iOS starter on real devices; add a calendar picker and production API integration.
 5. Improve maps using licensed geographic data, accessibility and mobile UX.
 
 ## Scope and limitations
 
-The web map is **schematic**, not a georeferenced street map. The web simulation is **not** a real ML prediction. The API is a development scaffold, not a production traffic service. No live navigation or safety-critical decisions should rely on the current version.
+The web map is **schematic**, not a georeferenced street map. The web simulation is **not** a real ML prediction. The API is a development scaffold, not a production traffic service. The native mobile starter has been committed but has not yet been built or tested on physical devices. No live navigation or safety-critical decisions should rely on the current version.
