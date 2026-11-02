@@ -11,7 +11,7 @@ python -m pip install -r backend/requirements.txt pytest httpx
 python -m pytest -q test_integration.py
 ```
 
-The test creates temporary data and model files, so it does not modify the deployed website or save a model to the repository. It checks API contract and integration, **not real-world model quality**.
+The test marks generated data as `synthetic_demo` and checks that the API exposes `synthetic_training_data: true`. It creates temporary data and model files, so it does not modify the deployed website or save a model to the repository. It checks API contract and integration, **not real-world model quality**.
 
 ## CI
 
